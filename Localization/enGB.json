@@ -1,0 +1,12 @@
+{
+    "strings": {
+		"482dd51e-0237-4577-bc66-f661bd492e93": {
+		  "Offset": 0,
+		  "Text": "Human Weapon Proficiency"
+		},
+		"fdd96666-24b7-41b9-8815-394d202017b1": {
+		  "Offset": 0,
+		  "Text": "This xenos can equip and use human weapons."
+		}
+    }
+}
