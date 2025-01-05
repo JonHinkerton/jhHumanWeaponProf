@@ -1,13 +1,7 @@
 using HarmonyLib;
-using Kingmaker;
 using Kingmaker.Blueprints.Items.Components;
-using Kingmaker.Blueprints.Items.Equipment;
-using Kingmaker.DialogSystem.Blueprints;
 using Kingmaker.Items;
-using static Kingmaker.EntitySystem.Stats.ModifiableValue;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Controllers;
-using Kingmaker.UnitLogic.Progression.Features;
 using Kingmaker.Blueprints;
 using Owlcat.Runtime.Core.Logging;
 using Kingmaker.Modding;
@@ -27,9 +21,6 @@ namespace jhhw
         {
             jhhwbmod = mod;
             //log = mod.Logger;
-
-
-
             Harmony harmony = new(jhhwbmod.Manifest.UniqueName);
             harmony.PatchAll();
             //log.Log("jhhw: Load");
@@ -52,7 +43,6 @@ namespace jhhw
                     "dddb6710ce25490e98608a2c07fbfc51"
                 };
 
-                // Assuming 'owner' represents the selected entity.
                 var selected = owner;
 
                 bool hasTalent = selected.Facts.List.Any(id => id.Blueprint.AssetGuidThreadSafe == hwTalent);
@@ -63,10 +53,9 @@ namespace jhhw
                 var item = __instance.Blueprint as BlueprintItemWeapon;
                 if (item == null) return;
 
-                // Check for faction talent restrictions
                 if (item.GetComponents<EquipmentRestrictionHasFacts>().Any(r => r.Facts.Any(f => factionTalents.Contains(f.AssetGuidThreadSafe))))
                 {
-                    if (CheckStatRestrictions(item, selected) && CheckProfessionalTalents(item, selected, profTalents))
+                    if (CheckStatRestrictions(item, selected) && CheckProfTalents(item, selected, profTalents))
                     {
                         __result = true;
                     }
@@ -78,18 +67,15 @@ namespace jhhw
                 return item.GetComponents<EquipmentRestrictionStat>().All(restriction => restriction.CanBeEquippedBy(selected));
             }
 
-            private static bool CheckProfessionalTalents(BlueprintItemWeapon item, MechanicEntity selected, string[] profTalents)
+            private static bool CheckProfTalents(BlueprintItemWeapon item, MechanicEntity selected, string[] profTalents)
             {
-                // Check if the item has any of the professional talents
                 bool itemHasAnyProfTalent = item.GetComponents<EquipmentRestrictionHasFacts>().Any(r => r.Facts.Any(f => profTalents.Contains(f.AssetGuidThreadSafe)));
 
-                // If the item does NOT have any element from profTalents, return true (no further checks needed)
                 if (!itemHasAnyProfTalent)
                 {
                     return true;
                 }
 
-                // If the item does have at least one profTalent, check if selected has the matching fact
                 foreach (var profTalent in profTalents)
                 {
                     if (item.GetComponents<EquipmentRestrictionHasFacts>().Any(r => r.Facts.Any(f => f.AssetGuidThreadSafe == profTalent)) &&
@@ -98,11 +84,8 @@ namespace jhhw
                         return true;
                     }
                 }
-
-                // If none of the profTalents that are present in the item are found in selected, return false
                 return false;
             }
         }
     }
 }
-//bool hasRestriction = item.GetComponents<EquipmentRestriction>().Aggregate(seed: true, (bool r, EquipmentRestriction restriction) => r && restriction.CanBeEquippedBy(selected));
